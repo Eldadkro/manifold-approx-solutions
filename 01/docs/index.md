@@ -17,6 +17,8 @@ Entry point for the project's mathematical notes, application ideas, and paper p
 
 ## Gaussian processes and probability
 
+- [Covariance properties used in GP regression](covariance-properties-for-gp-regression.md) — scalar and vector covariance rules, independence, positive semidefiniteness, and step-by-step applications to observation noise and posterior covariance in the manuscript.
+
 - [Deriving the GP predictive distribution from kernel ridge regression](deriving-the-gp-predictive-distribution-from-krr.md) — expands Section 5 of the RKHS-to-GP overview, deriving Gaussian observations, the joint distribution, and the conditional mean and variance.
 
 - [What is a Gaussian process?](what-is-a-gaussian-process.md)
