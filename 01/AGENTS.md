@@ -55,6 +55,9 @@ Adapt this outline to the assignment once its requirements are available:
 - Save simulation and experiment outputs under `results/`; reference those outputs from the paper as needed.
 
 ## Files and workflow
+- Documentation entry point: [Documentation index](docs/index.md).
+- Keep `docs/index.md` updated in the same change whenever documents under `docs/` are added, renamed, moved, deleted, or substantially revised. Maintain complete coverage (including subdirectories), accurate titles/descriptions, and working relative links; exclude editor configuration and generated artifacts.
+- After documentation changes, verify that every document is indexed and every index link resolves.
 - Follow the folder structure above for all new material.
 - Prefer targeted edits and preserve the author's existing writing and notation.
 - Verify bibliographic details and use primary sources when practical.

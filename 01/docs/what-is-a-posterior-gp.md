@@ -70,6 +70,76 @@ y\sim\mathcal N(m_X,C),
 \qquad C=K+\sigma^2I_n.
 $$
 
+### What does “averaging over prior uncertainty in $f_X$” mean?
+
+Before observing $y$, we do not know the latent vector $f_X$. The prior assigns probabilities to its possible values:
+
+$$
+f_X\sim\mathcal N(m_X,K).
+$$
+
+If we temporarily knew that $f_X=u$, the observation model would be
+
+$$
+y\mid f_X=u\sim\mathcal N(u,\sigma^2I_n).
+$$
+
+But we do not know $u$. To obtain the distribution of $y$ alone, we combine these conditional observation distributions, weighting each possible $u$ by its prior probability. This operation is called **marginalization**, or **integrating out $f_X$**.
+
+When $K$ is positive definite, so that the prior has an ordinary density on $\mathbb R^n$, this is
+
+$$
+\boxed{
+ p(y)=\int_{\mathbb R^n}p(y\mid f_X=u)\,p_{f_X}(u)\,du.
+}
+$$
+
+More generally, including singular $K$, we can write the same operation as an expectation with respect to the prior distribution:
+
+$$
+p(y)=\mathbb E_{f_X}\!\left[p(y\mid f_X)\right].
+$$
+
+For each fixed candidate observation vector $y$, we average its conditional density over the possible latent vectors. We are **not** averaging the observed measurements, and we are **not** simply replacing $f_X$ by its mean.
+
+To see the distinction, replacing $f_X$ by $m_X$ would give $\mathcal N(m_X,\sigma^2I_n)$ and discard uncertainty about the latent function. Marginalization retains that uncertainty and gives $\mathcal N(m_X,K+\sigma^2I_n)$ instead.
+
+#### Why do the covariances add?
+
+Since $y=f_X+\varepsilon$, with independent Gaussian vectors $f_X$ and $\varepsilon$, their sum is Gaussian. Its mean follows from the law of total expectation:
+
+$$
+\mathbb E[y]
+=\mathbb E_{f_X}\!\left[\mathbb E[y\mid f_X]\right]
+=\mathbb E[f_X]
+=m_X.
+$$
+
+The law of total covariance gives
+
+$$
+\begin{aligned}
+\operatorname{Cov}(y)
+&=\mathbb E_{f_X}\!\left[\operatorname{Cov}(y\mid f_X)\right]
+ +\operatorname{Cov}_{f_X}\!\left(\mathbb E[y\mid f_X]\right)\\
+&=\sigma^2I_n+K.
+\end{aligned}
+$$
+
+The first term is the measurement variability remaining even if the function values were known. The second is our prior uncertainty about those function values themselves. Gaussianity of the sum, together with these moments, establishes the stated distribution of $y$.
+
+For a scalar example, suppose $f(x_1)\sim\mathcal N(20,4)$ and the measurement noise has variance $1$. If the latent value were known to be $22$, then $y_1\mid f(x_1)=22\sim\mathcal N(22,1)$. Before knowing that latent value, however, averaging over its prior gives
+
+$$
+y_1\sim\mathcal N(20,5).
+$$
+
+The variance is $5$, not $1$, because both the unknown latent value and the measurement noise contribute.
+
+This distribution of $y$ before conditioning on its realized value is called the **prior predictive distribution**. Its density evaluated at the observed data is also called the **marginal likelihood** or **evidence**. The next step—forming the posterior—uses the observed $y$ to update our beliefs about $f$, rather than integrating those beliefs out to predict $y$.
+
+### The resulting observation covariance
+
 The matrix $C$ is positive definite even if $K$ is singular. Its two terms represent different sources of variation:
 
 - $K$: variation in the latent function under the prior.

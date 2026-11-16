@@ -77,9 +77,69 @@ $$
 k(x)=\begin{pmatrix}K(x,x_1)\\ \vdots\\ K(x,x_n)\end{pmatrix}.
 $$
 
-This is already a working kernel-based prediction algorithm.
+### Why is $f^*$ already a prediction rule?
 
-Given data points and a kernel, construct the Gram matrix, solve a linear system, and evaluate the function wherever you like.
+Here we work with real-valued functions on a domain $\Omega$, a symmetric positive-semidefinite kernel $K:\Omega\times\Omega\to\mathbb R$, and training observations $(x_i,y_i)\in\Omega\times\mathbb R$. As above, assume their Gram matrix $G$ is invertible.
+
+The observations tell us the output only at the training inputs $x_1,\ldots,x_n$. But the optimization problem returns a **function on all of $\Omega$**, not merely a vector of fitted training values. Once that function has been selected, we can use
+
+$$
+\widehat y_*=f^*(x_*)
+$$
+
+as our prediction at a previously unobserved input $x_*\in\Omega$. We do not need to know its true output to evaluate this expression.
+
+More precisely, $f^*$ is the fitted prediction rule; the procedure that constructs and evaluates it is a learning algorithm:
+
+1. **Fit once:** form $G\in\mathbb R^{n\times n}$ and solve $G\alpha=y$ for $\alpha\in\mathbb R^n$.
+2. **Predict at each new input:** evaluate the $n$ kernel values $K(x_*,x_i)$ and return $\sum_{i=1}^n\alpha_iK(x_*,x_i)$.
+
+In computation, solve the linear system rather than explicitly forming $G^{-1}$. The coefficients are learned from the observed outputs and reused for every new input.
+
+Why choose this particular function? Many functions could agree with the training data. The minimum-RKHS-norm criterion selects one of them, expressing a preference determined by the kernel and its norm. This is the method's **inductive bias**: the assumption used to extend observed values to unobserved inputs. Calling it a predictor does not guarantee accurate predictions; that depends on how well this preference matches the unknown function, the sampling locations, and any observation noise. Exact interpolation alone is not a generalization guarantee.
+
+### Why introduce $k(x)$, and how is it constructed?
+
+The vector $k(x)$ is not an additional model assumption or a new kernel. It simply collects the values needed to evaluate the finite kernel expansion at a query input $x$:
+
+$$
+k(x)_i=K(x,x_i),\qquad k(x)\in\mathbb R^n.
+$$
+
+Starting from the expansion supplied by the interpolation theorem,
+
+$$
+f^*(x)=\sum_{i=1}^n\alpha_iK(x,x_i)
+      =\begin{pmatrix}K(x,x_1)&\cdots&K(x,x_n)\end{pmatrix}\alpha
+      =k(x)^T\alpha.
+$$
+
+Substituting $\alpha=G^{-1}y$ gives the displayed prediction formula. Thus, we construct $k(x)$ **because these are exactly the entries required by function evaluation**, not because we guessed a separate prediction mechanism. The dimensions are
+
+$$
+\underbrace{k(x)^T}_{1\times n}\,
+\underbrace{G^{-1}}_{n\times n}\,
+\underbrace{y}_{n\times1}\in\mathbb R.
+$$
+
+The reproducing property also explains the entries geometrically:
+
+$$
+k(x)_i=K(x,x_i)=\langle K(\cdot,x_i),K(\cdot,x)\rangle_H.
+$$
+
+They measure how the evaluation representer at the query relates to each training representer. In this sense they are kernel similarities, although they need not be nonnegative or normalized. The distinction is:
+
+- $G$ compares **training inputs with training inputs** and stays fixed after fitting.
+- $k(x)$ compares **the query input with training inputs** and changes with the query.
+
+As a consistency check, at a training input $x_j$, $k(x_j)^T$ is row $j$ of $G$. Consequently,
+
+$$
+f^*(x_j)=k(x_j)^T\alpha=(G\alpha)_j=y_j.
+$$
+
+At a new input, the same expression supplies the predicted value. The entries of $k(x)$ alone are not averaging weights: the prediction also uses the learned coefficients $\alpha=G^{-1}y$, which account for the relationships among the training inputs.
 
 ## 2. Why does the solution use only $n$ kernel functions?
 
@@ -274,6 +334,8 @@ Used for probabilistic prediction and uncertainty quantification.
 The kernel has two interpretations, but the resulting prediction formulas are intimately connected.
 
 ## 5. Deriving Gaussian process regression
+
+For a step-by-step derivation of the conditional Gaussian distribution below, including why $y$ is Gaussian and how an independent residual yields the posterior mean and variance, see [Deriving the GP predictive distribution from kernel ridge regression](deriving-the-gp-predictive-distribution-from-krr.md). That note explicitly translates notation and regularization conventions.
 
 Suppose we observe
 

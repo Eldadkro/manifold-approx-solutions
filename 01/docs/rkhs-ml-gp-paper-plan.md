@@ -1,10 +1,12 @@
 # Plan: connecting RKHS, machine learning, and Gaussian processes
 
-**Status:** Working proposal for discussion, not a finalized paper outline.
+**Status:** Working plan with agreed scope; mathematical emphasis and course alignment remain open.
 
 **Goal:** Develop a short, mathematically grounded account of how RKHS theory leads to a learning algorithm, and how the same kernel yields a Gaussian-process model with uncertainty estimates.
 
-**Decisions still open:** The application, dataset, manuscript length, exact course results, and whether experiments are required. Kernel ridge regression (KRR) is the proposed bridge, subject to the author's approval.
+**Agreed scope:** A theoretical exposition of approximately **1–3 pages**, with **no application, dataset, or empirical component**.
+
+**Decisions still open:** Exact course results, mathematical emphasis, and whether references count toward the page limit. Kernel ridge regression (KRR) is the proposed bridge, subject to the author's approval.
 
 ## 1. Proposed central question
 
@@ -25,10 +27,9 @@ Under matching assumptions and parameter conventions, the KRR predictor equals t
 
 Ask the author for:
 
-1. The assignment instructions, including length and experiment requirements.
+1. The assignment instructions, to check compatibility with the agreed theoretical scope and clarify whether references count toward the 1–3 pages.
 2. The relevant lecture notes or a list of covered definitions and theorems.
 3. Whether KRR should be the main learning method or merely a comparison point.
-4. A preferred real-world problem, and whether existing data may be used.
 
 Existing notes refer to lecture definitions and theorem numbers, but these references still need checking against the actual lecture notes. Do not treat them as verified course alignment.
 
@@ -54,7 +55,7 @@ $$
 
 If minimum-norm interpolation is covered in the course, use it as a starting point. Then explain why noisy measurements motivate a soft data-fit penalty instead of exact interpolation.
 
-### Step B — Formulate a concrete learning problem
+### Step B — Formulate the regression problem
 
 For observations $(x_i,y_i)_{i=1}^n$, propose squared-loss regression:
 
@@ -140,30 +141,19 @@ Discuss what is shared and what differs:
 
 **Important qualification:** Do not say that a GP is simply a random element of its associated RKHS. For common infinite-dimensional kernels, GP sample paths lie outside that RKHS almost surely, even though the posterior mean has a finite kernel expansion in it. A function-space MAP interpretation is unnecessary for the main argument and should be omitted unless carefully justified.
 
-## 4. Choose one application after agreement
+## 4. Length and scope
 
-The application should make both noisy regression and uncertainty meaningful. Possible directions—not commitments—include:
+The manuscript will be a **1–3-page theoretical exposition**, without an application, dataset, simulations, or empirical evaluation. Regression is the mathematical setting, not a proposed experiment.
 
-- Predicting an environmental measurement from location and possibly time.
-- Predicting a physical response from measured material or device properties.
-- Learning a surrogate for an expensive scientific calculation.
+Prioritize one coherent argument over a survey:
 
-Choose based on data availability, an interpretable kernel, manageable sample size, and a clear evaluation question. Verify provenance and suitability before selecting a dataset.
+- Define only the RKHS and probability concepts needed for the comparison.
+- Retain the short orthogonal-decomposition argument and the resulting KRR predictor.
+- State the joint Gaussian model and use the conditioning formula; omit a general derivation of Gaussian conditioning if space is tight.
+- Highlight the matching posterior mean and explain what posterior covariance adds.
+- Keep qualifications concise and use a small number of verified references.
 
-If an experiment is included, use one dataset and a small set of comparisons rather than a broad benchmark. A synthetic illustration can help explain the formulas, but should not be presented as real-world evidence.
-
-### Proposed minimal empirical protocol
-
-1. Specify inputs, prediction target, units, and data provenance.
-2. Choose a split appropriate to the application; spatial or temporal dependence may require blocked rather than random splitting.
-3. Fit preprocessing on training data only.
-4. Select kernel parameters and regularization using training/validation data only; state the selection criterion.
-5. Numerically check agreement of KRR predictions and GP posterior means under matched parameters.
-6. Report held-out prediction error, for example RMSE, alongside a simple baseline.
-7. If uncertainty is evaluated, report predictive interval coverage and width, distinguishing latent-function intervals from noisy-observation intervals. Nominal GP coverage is a model-based claim, not a general guarantee.
-8. Record random seeds, numerical jitter, and any deviations from the mathematical model.
-
-If approved, implement with `uv` in `sim/` and save outputs in `results/`. No experiment or result is implied by this plan.
+Aim for roughly two pages of exposition, with flexibility up to three pages for derivations and references. Whether references count toward the limit remains to be clarified.
 
 ## 5. Relationship to manifold approximation
 
@@ -176,12 +166,10 @@ Unless the assignment requires more, use the course's function-space and approxi
 
 ## 6. Provisional manuscript outline
 
-1. **Motivation:** One prediction problem and the need to learn from noisy observations.
-2. **RKHS background:** Kernel, reproducing property, and relevant course results.
-3. **From approximation to learning:** Regularized objective, finite-span argument, and KRR formula.
-4. **Probabilistic view:** GP definition, Gaussian conditioning, and the matching posterior mean.
-5. **Application or worked illustration:** Only the empirical component agreed with the author.
-6. **Discussion:** Uncertainty, kernel assumptions, limitations, and the precise course connection.
+1. **Motivation and RKHS background:** The central question, kernel, and reproducing property (approximately half a page).
+2. **From approximation to learning:** Regularized objective, finite-span argument, and KRR formula (approximately half to one page).
+3. **Probabilistic view and comparison:** GP model, conditioning formulas, matching posterior mean, and uncertainty (approximately half to one page).
+4. **Closing remarks and references:** Brief qualifications and the precise course connection, within the overall 1–3-page target.
 
 Keep broader topics—classification, deep kernels, sparse GP methods, and manifold learning—out of the initial scope.
 
@@ -193,20 +181,20 @@ Use these local notes as starting material rather than independently verified re
 - [Kernel ridge regression](kernel-ridge-regression.md)
 - [What is a Gaussian process?](what-is-a-gaussian-process.md)
 - [What is a posterior?](what-is-a-posterior.md)
-- [Possible real-world applications](real-world-use-cases-of-rkhs-kernel-learning-and-gaussian-processes.md)
 
-Before drafting, verify sources for the RKHS facts, representer argument, and GP conditioning formulas, along with the dataset source if applicable. Separate verified course material from additional statistical background and our empirical observations.
+Application notes are outside the agreed scope.
+
+Before drafting, verify sources for the RKHS facts, representer argument, and GP conditioning formulas. Separate verified course material from additional statistical background.
 
 ## 8. Action checklist
 
 - [ ] Obtain the assignment and relevant lecture notes.
 - [ ] Approve or revise the proposed RKHS → KRR → GP narrative.
-- [ ] Agree on manuscript length and whether experiments are needed.
-- [ ] Select one application and verify its data source.
+- [x] Agree on scope: 1–3 pages, no application, dataset, or empirical component.
+- [ ] Clarify whether references count toward the page limit.
 - [ ] Fix notation, loss normalization, kernel amplitude, and noise conventions.
 - [ ] Draft and check the finite-span and Gaussian-conditioning derivations.
 - [ ] Verify references and course theorem numbering.
-- [ ] Implement and evaluate the small experiment, if approved.
 - [ ] Write the LaTeX manuscript in `paper/` and compile the PDF.
 
-**Next discussion:** Does this mathematical narrative match the author's intended emphasis, and what does the assignment require beyond explaining the connection?
+**Next discussion:** Within the agreed short theoretical scope, does the RKHS → KRR → GP narrative match the author's intended emphasis, and which results can be assumed from the course?
