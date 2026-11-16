@@ -46,6 +46,7 @@ For now assume $K$ is invertible, so every response vector can be \textbf{interp
 \textbf{Remak:} I am so sorry that I didn't think to research the problems in the OP of the Optimal intarpolant... would have been a page, but alas I already invested too much so I will
 only assume that the Gram matrix isn't singular and that the feasible set isn't empty.
 \subsection{Optimal interpolant in reproducing kernel Hilbert space}
+Given $\Hk$ RKHS we wish to find the optimal solution to the following OP, such that the esimator (interpolant) fits the measurements exactly and is the one with the smallest possible norm.
 \begin{equation}
 	f_{\mathrm{int}}=\operatorname*{arg\,min}_{f\in\Hk}\|f\|_{\Hk}^2
 	\quad\text{subject to}\quad f(x_i)=y_i\quad(i=1,\ldots,n).
@@ -64,18 +65,26 @@ Removing $f_\perp$ preserves the observed values and decreases the norm unless $
 	\label{eq:interpolant}
 \end{equation}
 Interpolation fixes the training values; the RKHS norm determines how they are extended to unobserved inputs. This preference depends on the kernel, rather than on a universal notion of smoothness.
+Because of Moore–Aronszajn.
 
 \section{Kernel ridge regression: relaxing interpolation}
-Exact agreement may be undesirable when responses contain measurement noise. Instead of enforcing the constraints in~\eqref{eq:interpolation}, KRR penalizes their violation:
+Exact agreement with the measured values may be undesirable when responses contain measurement noise. Instead of enforcing the constraints in~\eqref{eq:interpolation}, KRR penalizes their violation:
 \begin{equation}
 	\widehat f_\lambda=\operatorname*{arg\,min}_{f\in\Hk}
 	\left\{\frac1n\sum_{i=1}^n(y_i-f(x_i))^2+\lambda\|f\|_{\Hk}^2\right\},
 	\qquad\lambda>0.
 	\label{eq:krr}
 \end{equation}
-The first term measures training error; the second controls the RKHS norm. This is a learning rule because it maps the observed sample to a predictor at new inputs. Regularization expresses a preference that can help with noisy data, but does not by itself guarantee generalization.
+The first term measures training error; the second controls the RKHS norm, which in this regime could be interpreted as the preference for a regressors of a spacific form aside
+from the inductive bias we introduced by picking the kernel and "locking" the solutions into the spacific RKHS.\\
+This is a learning rule because it maps the observed sample to a predictor at new inputs. Regularization expresses a preference that can help with noisy data, but does not by itself guarantee generalization.
 
-The same orthogonal decomposition applies: removing $f_\perp$ leaves the loss unchanged and strictly decreases the penalty if $f_\perp\ne0$. Hence $\widehat f_\lambda\in V$. This is the representer argument for this particular objective. For $f=\sum_j\alpha_jk(\cdot,x_j)$,
+The same orthogonal decomposition applies: removing $f_\perp$ leaves the loss unchanged because the ortogonal
+element doesn't effect the measured points (first part of the loss) becuase:
+\[
+	\text{for: } h\in f_\perp,i=1,2..,n \qquad \langle h,k(\cdot,x_i)\rangle_{\Hk} = 0.
+\]
+and strictly punish the target function if $f_\perp\ne0$. Hence $\widehat f_\lambda\in V$. This is the representer argument for this particular objective. For $f=\sum_j\alpha_jk(\cdot,x_j)$,
 \[
 	(f(x_i))_{i=1}^n=K\alpha,\qquad \|f\|_{\Hk}^2=\alpha^TK\alpha,
 \]

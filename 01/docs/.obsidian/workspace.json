@@ -90,12 +90,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "gaussian-processes-for-machine-learning-reading-note.md",
+                "file": "why-kernel-ridge-regression-stays-in-the-kernel-span.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "gaussian-processes-for-machine-learning-reading-note"
+              "title": "why-kernel-ridge-regression-stays-in-the-kernel-span"
             }
           }
         ]
@@ -177,7 +177,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "gaussian-processes-for-machine-learning-reading-note.md",
+                "file": "why-kernel-ridge-regression-stays-in-the-kernel-span.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -196,7 +196,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "gaussian-processes-for-machine-learning-reading-note.md",
+                "file": "why-kernel-ridge-regression-stays-in-the-kernel-span.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
@@ -239,7 +239,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "gaussian-processes-for-machine-learning-reading-note.md",
+                "file": "why-kernel-ridge-regression-stays-in-the-kernel-span.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
@@ -281,9 +281,9 @@
   },
   "active": "0f31cdab1ef93c42",
   "lastOpenFiles": [
+    "gaussian-processes-for-machine-learning-reading-note.md",
     "singular-gram-matrices-in-rkhs-interpolation.md",
     "deriving-the-gp-predictive-distribution-from-krr.md",
-    "gaussian-processes-for-machine-learning-reading-note.md",
     "from-rkhs-to-kernel-machine-learning-and-gaussian-processes.md",
     "kernel-ridge-regression.md",
     "what-is-a-posterior-gp.md",
