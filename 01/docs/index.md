@@ -8,7 +8,9 @@ Entry point for the project's mathematical notes, application ideas, and paper p
 - [Real-world uses of RKHS theory, kernel learning, and Gaussian processes](real-world-use-cases-of-rkhs-kernel-learning-and-gaussian-processes.md)
 - [Plan: connecting RKHS, machine learning, and Gaussian processes](rkhs-ml-gp-paper-plan.md)
 
-## Kernel ridge regression
+## RKHS interpolation and kernel ridge regression
+
+- [Singular Gram matrices in RKHS interpolation](singular-gram-matrices-in-rkhs-interpolation.md) — singularity, target compatibility, uniqueness of the minimum-norm function, pseudoinverse fitting, and numerical conditioning.
 
 - [Kernel ridge regression](kernel-ridge-regression.md)
 - [Why kernel ridge regression stays in the kernel span](why-kernel-ridge-regression-stays-in-the-kernel-span.md) — why an arbitrarily small positive norm penalty still excludes components perpendicular to the training-kernel span.
@@ -21,6 +23,10 @@ Entry point for the project's mathematical notes, application ideas, and paper p
 - [What is a posterior?](what-is-a-posterior.md)
 - [What is a posterior Gaussian process?](what-is-a-posterior-gp.md)
 - [Random functions, covariance kernels, and the connection to KRR](random-functions-mean-covariance-and-krr.md)
+
+## Suggested reading
+
+- [Reading note: Gaussian Processes for Machine Learning](gaussian-processes-for-machine-learning-reading-note.md) — unread background source, official book and chapter links, and the decision not to cite it in the current manuscript.
 
 ## Maintenance
 

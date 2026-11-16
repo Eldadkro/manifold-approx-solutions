@@ -2,10 +2,12 @@
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{amsmath,amssymb}
 \usepackage{microtype}
-\usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue,citecolor=blue]{hyperref}
+
 \newcommand{\Hk}{\mathcal H_k}
 \newcommand{\R}{\mathbb R}
 \newcommand{\E}{\mathbb E}
+
 \title{From RKHS Interpolation to Learning:\\Kernel Ridge Regression and Gaussian Processes}
 \author{}
 \date{}
@@ -13,120 +15,129 @@
 \begin{document}
 \maketitle
 \vspace{-2em}
+
 \begin{abstract}
-Minimum-norm interpolation in a reproducing kernel Hilbert space (RKHS) selects a function that matches observed values exactly. When observations are noisy, kernel ridge regression (KRR) replaces exact agreement with a squared-error penalty. We derive both estimators using the reproducing property and show that the KRR estimator is also the posterior mean under a Gaussian-process prior with Gaussian observation noise. The same kernel thus supports two interpretations: a geometry for regularized approximation and a covariance model for probabilistic prediction.
+	RKHS Interpolation connect the pointwise measurements to the inner product structure using reproducing kernels, in here I will show how to deal with a "relaxed" optimization problem in a regime with noisy measurements.
+	I will do that by establishing a new \textbf{Optimization Problem} (OP), which will be solved with a technique knowen as \textbf{Kernel Ridge Regression} (KRR) where we use the geometry of the RKHS to produce a minimizer.
+	Later I connect the KRR deterministic solution to a posterior mean estimator with \textbf{Gaussian Processes} (GP) prior.
 \end{abstract}
 
+\textbf{Remark:} I am sorry that this is reletivly long, sadly I believe that I picked a very complicated subject (for me at least) and there is a lot to talk about but I tried to minimize the exposor to new material to the
+bare minimum possible, which caused some of the deriviations to be missed, in case you are interested, all of the background work is in
+\href{https://github.com/Eldadkro/manifold-approx-solutions}{repository}.
 \section{RKHS interpolation: exact agreement with the data}
 Let $\mathcal X\subseteq\R^d$ be an input domain and let $k:\mathcal X\times\mathcal X\to\R$ be a symmetric positive-semidefinite kernel: for every finite collection $z_1,\ldots,z_m\in\mathcal X$ and $a\in\R^m$,
 $\sum_{i,j=1}^m a_i a_j k(z_i,z_j)\geq0$.
 Its associated RKHS $\Hk$ is a Hilbert space of functions on $\mathcal X$ with
 \begin{equation}
- k(\cdot,x)\in\Hk,\qquad f(x)=\langle f,k(\cdot,x)\rangle_{\Hk}.
- \label{eq:reproduction}
+	k(\cdot,x)\in\Hk,\qquad f(x)=\langle f,k(\cdot,x)\rangle_{\Hk}.
+	\label{eq:reproduction}
 \end{equation}
-In particular, evaluation is bounded: $|f(x)|\leq\|f\|_{\Hk}\sqrt{k(x,x)}$. These standard RKHS facts are reviewed in \cite[Sec.~6.1]{rasmussen2006}.
+In particular, evaluation is bounded: $|f(x)|\leq\|f\|_{\Hk}\sqrt{k(x,x)}$.
 
 Fix inputs $x_1,\ldots,x_n\in\mathcal X$ and observed responses $y=(y_1,\ldots,y_n)^T\in\R^n$. Define the sample-dependent Gram matrix and kernel vector by
 \[
- K_{ij}=k(x_i,x_j),\quad K\in\R^{n\times n},\qquad
- k_x=(k(x_1,x),\ldots,k(x_n,x))^T\in\R^n.
+	K_{ij}=k(x_i,x_j),\quad K\in\R^{n\times n},\qquad
+	k_x=(k(x_1,x),\ldots,k(x_n,x))^T\in\R^n.
 \]
-The kernel is a function on pairs of inputs; $K$ is its evaluation on this particular sample. Minimum-norm interpolation solves
+The kernel is a function on pairs of inputs; $K$ is its evaluation on this particular sample. \\
+For now assume $K$ is invertible, so every response vector can be \textbf{interpolated}.
+\\
+\textbf{Remak:} I am so sorry that I didn't think to research the problems in the OP of the Optimal intarpolant... would have been a page, but alas I already invested too much so I will
+only assume that the Gram matrix isn't singular and that the feasible set isn't empty.
+\subsection{Optimal interpolant in reproducing kernel Hilbert space}
 \begin{equation}
- f_{\mathrm{int}}=\operatorname*{arg\,min}_{f\in\Hk}\|f\|_{\Hk}^2
- \quad\text{subject to}\quad f(x_i)=y_i\quad(i=1,\ldots,n).
- \label{eq:interpolation}
+	f_{\mathrm{int}}=\operatorname*{arg\,min}_{f\in\Hk}\|f\|_{\Hk}^2
+	\quad\text{subject to}\quad f(x_i)=y_i\quad(i=1,\ldots,n).
+	\label{eq:interpolation}
 \end{equation}
-For now assume $K$ is invertible, so every response vector can be interpolated.
 
 The reproducing property reduces this problem to finite dimensions. Set
 $V=\operatorname{span}\{k(\cdot,x_1),\ldots,k(\cdot,x_n)\}$ and decompose $f=f_V+f_\perp$ orthogonally. Equation~\eqref{eq:reproduction} gives $f_\perp(x_i)=0$, whereas
 \begin{equation}
- \|f\|_{\Hk}^2=\|f_V\|_{\Hk}^2+\|f_\perp\|_{\Hk}^2.
- \label{eq:split}
+	\|f\|_{\Hk}^2=\|f_V\|_{\Hk}^2+\|f_\perp\|_{\Hk}^2.
+	\label{eq:split}
 \end{equation}
 Removing $f_\perp$ preserves the observed values and decreases the norm unless $f_\perp=0$. Thus the minimum-norm interpolant lies in $V$. Writing it as $\sum_{j=1}^n\alpha_j k(\cdot,x_j)$, the constraints become $K\alpha=y$, yielding
 \begin{equation}
- \boxed{f_{\mathrm{int}}(x)=k_x^TK^{-1}y.}
- \label{eq:interpolant}
+	\boxed{f_{\mathrm{int}}(x)=k_x^TK^{-1}y.}
+	\label{eq:interpolant}
 \end{equation}
 Interpolation fixes the training values; the RKHS norm determines how they are extended to unobserved inputs. This preference depends on the kernel, rather than on a universal notion of smoothness.
 
 \section{Kernel ridge regression: relaxing interpolation}
 Exact agreement may be undesirable when responses contain measurement noise. Instead of enforcing the constraints in~\eqref{eq:interpolation}, KRR penalizes their violation:
 \begin{equation}
- \widehat f_\lambda=\operatorname*{arg\,min}_{f\in\Hk}
- \left\{\frac1n\sum_{i=1}^n(y_i-f(x_i))^2+\lambda\|f\|_{\Hk}^2\right\},
- \qquad\lambda>0.
- \label{eq:krr}
+	\widehat f_\lambda=\operatorname*{arg\,min}_{f\in\Hk}
+	\left\{\frac1n\sum_{i=1}^n(y_i-f(x_i))^2+\lambda\|f\|_{\Hk}^2\right\},
+	\qquad\lambda>0.
+	\label{eq:krr}
 \end{equation}
 The first term measures training error; the second controls the RKHS norm. This is a learning rule because it maps the observed sample to a predictor at new inputs. Regularization expresses a preference that can help with noisy data, but does not by itself guarantee generalization.
 
-The same orthogonal decomposition applies: removing $f_\perp$ leaves the loss unchanged and strictly decreases the penalty if $f_\perp\ne0$. Hence $\widehat f_\lambda\in V$. This is the representer argument for this particular objective \cite[Sec.~6.2]{rasmussen2006}. For $f=\sum_j\alpha_jk(\cdot,x_j)$,
+The same orthogonal decomposition applies: removing $f_\perp$ leaves the loss unchanged and strictly decreases the penalty if $f_\perp\ne0$. Hence $\widehat f_\lambda\in V$. This is the representer argument for this particular objective. For $f=\sum_j\alpha_jk(\cdot,x_j)$,
 \[
- (f(x_i))_{i=1}^n=K\alpha,\qquad \|f\|_{\Hk}^2=\alpha^TK\alpha,
+	(f(x_i))_{i=1}^n=K\alpha,\qquad \|f\|_{\Hk}^2=\alpha^TK\alpha,
 \]
 so the coefficient objective is
 $J(\alpha)=n^{-1}\|y-K\alpha\|_2^2+\lambda\alpha^TK\alpha$.
 Its stationarity equation is
 \begin{equation}
- \nabla J(\alpha)=\frac2n K\bigl[(K+n\lambda I_n)\alpha-y\bigr]=0.
+	\nabla J(\alpha)=\frac2n K\bigl[(K+n\lambda I_n)\alpha-y\bigr]=0.
 \end{equation}
 We need not cancel $K$, which might be singular. Since $K$ is positive semidefinite and $\lambda>0$, $K+n\lambda I_n$ is positive definite. The vector
 $\alpha_\lambda=(K+n\lambda I_n)^{-1}y$ satisfies stationarity and minimizes the convex objective. Therefore
 \begin{equation}
- \boxed{\widehat f_\lambda(x)=k_x^T(K+n\lambda I_n)^{-1}y.}
- \label{eq:krr-predictor}
+	\boxed{\widehat f_\lambda(x)=k_x^T(K+n\lambda I_n)^{-1}y.}
+	\label{eq:krr-predictor}
 \end{equation}
 The function minimizer is unique because~\eqref{eq:krr} is strictly convex. If $K$ is singular, coefficient vectors need not be unique, but their differences in $\ker K$ represent the zero function. In computation, the inverse notation means solving a linear system.
 
 The fitted training values satisfy
 \[
- y-K\alpha_\lambda=n\lambda(K+n\lambda I_n)^{-1}y,
+	y-K\alpha_\lambda=n\lambda(K+n\lambda I_n)^{-1}y,
 \]
 so exact agreement is generally lost. When $K$ is invertible, letting $\lambda\downarrow0$ recovers~\eqref{eq:interpolant}, including convergence in $\Hk$. Thus KRR is a relaxation of minimum-norm interpolation, not a separate construction. Unlike exact interpolation for arbitrary $y$, it remains well-defined for singular $K$.
 
 \section{Gaussian processes: the same estimator by conditioning}
 Now keep the inputs fixed and adopt a probabilistic model. A zero-mean Gaussian process (GP) with covariance kernel $k$ is a collection of random variables such that every finite vector of function values is jointly Gaussian, with mean zero and covariance obtained by evaluating $k$. Assume
 \begin{equation}
- f\sim\operatorname{GP}(0,k),\qquad y_i=f(x_i)+\varepsilon_i,\qquad
- \varepsilon_i\overset{\mathrm{iid}}{\sim}\mathcal N(0,\sigma^2),\quad\sigma^2>0,
- \label{eq:gp}
+	f\sim\operatorname{GP}(0,k),\qquad y_i=f(x_i)+\varepsilon_i,\qquad
+	\varepsilon_i\overset{\mathrm{iid}}{\sim}\mathcal N(0,\sigma^2),\quad\sigma^2>0,
+	\label{eq:gp}
 \end{equation}
 with noise independent of $f$. Here $k(x,x')$ specifies prior covariance between function values, rather than directly specifying a penalty.
 
 Write $C=K+\sigma^2I_n$. For a test input $x$, independence of the noise gives
 \begin{equation}
- \begin{pmatrix}y\\f(x)\end{pmatrix}
- \sim\mathcal N\!\left(0,
- \begin{pmatrix}C&k_x\\k_x^T&k(x,x)\end{pmatrix}\right).
- \label{eq:joint}
+	\begin{pmatrix}y\\f(x)\end{pmatrix}
+	\sim\mathcal N\!\left(0,
+	\begin{pmatrix}C&k_x\\k_x^T&k(x,x)\end{pmatrix}\right).
+	\label{eq:joint}
 \end{equation}
 To see the conditioning step, define $r(x)=f(x)-k_x^TC^{-1}y$. Its covariance with $y$ is $k_x^T-k_x^TC^{-1}C=0$. Joint Gaussianity therefore makes $r(x)$ independent of $y$. Its mean is zero, so
 \begin{align}
- m(x):=\E[f(x)\mid y]&=k_x^T(K+\sigma^2I_n)^{-1}y,\label{eq:mean}\\
- c(x,x'):=\operatorname{Cov}(f(x),f(x')\mid y)
- &=k(x,x')-k_x^T(K+\sigma^2I_n)^{-1}k_{x'}.
- \label{eq:cov}
+	m(x):=\E[f(x)\mid y] & =k_x^T(K+\sigma^2I_n)^{-1}y,\label{eq:mean} \\
+	c(x,x'):=\operatorname{Cov}(f(x),f(x')\mid y)
+	                     & =k(x,x')-k_x^T(K+\sigma^2I_n)^{-1}k_{x'}.
+	\label{eq:cov}
 \end{align}
-The covariance follows by computing $\operatorname{Cov}(r(x),r(x'))$. These are the usual GP regression formulas \cite[Sec.~2.2]{rasmussen2006}. The posterior is a distribution over functions; $m$ is its mean function, not a probability. At each input it minimizes posterior expected squared prediction error.
+The covariance follows by computing $\operatorname{Cov}(r(x),r(x'))$. These are the GP regression formulas. The posterior is a distribution over functions; $m$ is its mean function, not a probability. At each input it minimizes posterior expected squared prediction error.
 
 Comparing~\eqref{eq:krr-predictor} and~\eqref{eq:mean} gives the central identification:
 \begin{equation}
- \boxed{\sigma^2=n\lambda\quad\Longrightarrow\quad m(x)=\widehat f_\lambda(x)
- \quad\text{for every }x\in\mathcal X.}
- \label{eq:equivalence}
+	\boxed{\sigma^2=n\lambda\quad\Longrightarrow\quad m(x)=\widehat f_\lambda(x)
+		\quad\text{for every }x\in\mathcal X.}
+	\label{eq:equivalence}
 \end{equation}
 This equality uses the same kernel, including its amplitude, a zero prior mean, and the averaged loss in~\eqref{eq:krr}. If the GP covariance is instead $\tau^2k$ with $\tau^2>0$, while KRR uses $\Hk$, the matching condition becomes $n\lambda=\sigma^2/\tau^2$. It is the noise relative to prior scale that determines the effective regularization. With invertible $K$, the noiseless limit of the posterior mean recovers minimum-norm interpolation.
 
 \section{What the connection does---and does not---identify}
 RKHS interpolation, KRR, and GP regression share a finite kernel representation, but begin with different questions. Interpolation seeks the least-norm exact fit. KRR allows residual error in exchange for a smaller norm. GP regression conditions a prior on noisy data and obtains the same fitted mean under~\eqref{eq:equivalence}.
 
-The GP model additionally supplies uncertainty: $c(x,x)$ is the posterior variance of the latent function, while a new independently noisy response has variance $c(x,x)+\sigma^2$. These are model-dependent uncertainties, not guarantees of calibration when the model is misspecified. The KRR point estimate alone does not specify them. Nor does equality of the mean functions make the GP a random element of $\Hk$: for common infinite-dimensional kernels, GP sample paths lie outside the associated RKHS almost surely, although the posterior mean is a finite kernel expansion in it \cite[Sec.~6.1]{rasmussen2006}.
+The GP model additionally supplies uncertainty: $c(x,x)$ is the posterior variance of the latent function, while a new independently noisy response has variance $c(x,x)+\sigma^2$. These are model-dependent uncertainties, not guarantees of calibration when the model is misspecified. The KRR point estimate alone does not specify them. Equality of the mean functions does not identify the underlying frameworks: the posterior mean is a finite kernel expansion in $\Hk$, but this does not establish that random functions drawn from the GP belong to $\Hk$.
 
 The approximation-theoretic contribution is concrete: bounded evaluation and orthogonal projection turn a function-space problem into a finite linear system. Relaxing interpolation turns that construction into a learning algorithm, and Gaussian conditioning gives it a probabilistic interpretation. This is a connection through RKHS approximation; using a kernel alone does not imply that the method exploits an underlying data manifold.
 
-\bibliographystyle{plain}
-\bibliography{references}
+% References will be added after the author has reviewed the relevant sources.
 \end{document}
